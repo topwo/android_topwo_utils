@@ -1,4 +1,4 @@
-package com.topwo.lib;
+package com.topwo.utils;
 
 import android.app.Application;
 import android.util.Log;
@@ -12,7 +12,6 @@ import com.liulishuo.filedownloader.connection.FileDownloadUrlConnection;
 import com.liulishuo.filedownloader.util.FileDownloadUtils;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TopwoFileDownloader {
