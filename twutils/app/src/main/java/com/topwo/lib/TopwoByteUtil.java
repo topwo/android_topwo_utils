@@ -1,9 +1,9 @@
-package com.topwo.twutils;
+package com.topwo.lib;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-public class TwByteUtil {
+public class TopwoByteUtil {
     private static char forDigit(int digit, int radix) {
         if ((digit >= radix) || (digit < 0)) {
             return '\0';
