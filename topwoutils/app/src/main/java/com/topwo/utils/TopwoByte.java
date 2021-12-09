@@ -3,7 +3,9 @@ package com.topwo.utils;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-public class TopwoByteUtil {
+public class TopwoByte {
+    private static final String TAG = TopwoByte.class.getSimpleName();
+
     private static char forDigit(int digit, int radix) {
         if ((digit >= radix) || (digit < 0)) {
             return '\0';
