@@ -46,7 +46,7 @@ public class TopwoSharedPreferences {
             }
         }
 
-        return false;
+        return defaultValue;
     }
 
     public static int getIntegerForKey(String key, int defaultValue) {
@@ -104,7 +104,7 @@ public class TopwoSharedPreferences {
             }
         }
 
-        return 0;
+        return defaultValue;
     }
 
     public static float getFloatForKey(String key, float defaultValue) {
@@ -133,7 +133,7 @@ public class TopwoSharedPreferences {
             }
         }
 
-        return 0.0f;
+        return defaultValue;
     }
 
     public static String getStringForKey(String key, String defaultValue) {
@@ -191,6 +191,11 @@ public class TopwoSharedPreferences {
     public static void setDoubleForKey(String key, double value) {
         // SharedPreferences doesn't support recording double value
         setFloatForKey(key, (float)value);
+    }
+
+    public static boolean isContainKey(String key) {
+        SharedPreferences settings = sContext.getSharedPreferences(TopwoSharedPreferences.PREFS_NAME, Context.MODE_PRIVATE);
+        return settings.contains(key);
     }
 
     public static void deleteValueForKey(String key) {
