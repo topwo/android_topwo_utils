@@ -16,7 +16,7 @@ public class TopwoSharedPreferences {
     private static Context sContext = null;
 
     public static void init(Context context) {
-        sContext = context;
+        sContext = context.getApplicationContext();
     }
 
     public static boolean getBoolForKey(String key, boolean defaultValue) {

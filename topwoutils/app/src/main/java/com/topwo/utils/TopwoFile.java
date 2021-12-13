@@ -23,7 +23,7 @@ public class TopwoFile {
     private static String s_writable_path;
 
     public static void init(Context context) {
-        sContext = context;
+        sContext = context.getApplicationContext();
         s_writable_path = sContext.getFilesDir().getAbsolutePath();
     }
 
