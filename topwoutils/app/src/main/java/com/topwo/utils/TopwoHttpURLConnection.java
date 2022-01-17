@@ -10,35 +10,50 @@ public class TopwoHttpURLConnection {
 
     public static final int BUFFER = 4096;
 
-    public interface ResponseListener {
+    public interface TopwoHttpURLConnectionListener {
         /**
-         * 输出流接收outputStream.write(buffer, 0, len);
+         * 成功连接;
+         * conn.setRequestProperty("Accept-Encoding", "identity");
+         * conn.setRequestProperty("Content-Type", "application/json");
+         * conn.setRequestMethod("POST");
+         * @param conn
+         */
+        void onHttpURLConnection(HttpURLConnection conn);
+        /**
+         * 请求成功，返回输出流接收outputStream.write(buffer, 0, len);
          * @param buffer
          * @param len
          */
-        void onResponseRead(byte[] buffer, int len);
+        void onResponseSuccess(byte[] buffer, int len);
+
+        /**
+         * 请求失败，返回错误码;
+         * @param code
+         */
+        void onResponseFail(int code);
     }
 
     /**
      * 在回调里使用ByteArrayOutputStream、FileOutputStream等OutputStream输出流接收（outputStream.write(buffer, 0, len);）
      * @param url_str
      * @param req_byte
-     * @param responseListener
+     * @param listener
      * @throws Exception
      */
-    public static void httpURLConnection(String url_str, byte[] req_byte, ResponseListener responseListener) throws Exception {
+    public static void httpURLConnection(String url_str, byte[] req_byte, TopwoHttpURLConnectionListener listener) throws Exception {
         InputStream inputStream = null;
         OutputStream outputStream = null;
         HttpURLConnection conn = null;
         Exception ex = null;
+        int code = 0;
         try {
             URL url = new URL(url_str);
             conn = (HttpURLConnection)url.openConnection();
-            conn.setDoOutput(false);
-            conn.setRequestProperty("Accept-Encoding", "identity");
-            if(req_byte != null){
+            if (listener != null) {
+                listener.onHttpURLConnection(conn);
+            }
+            if (req_byte != null) {
                 conn.setDoOutput(true);
-                conn.setRequestMethod("POST");
                 //获取conn的输出流
                 outputStream = conn.getOutputStream();
                 //将请求体写入到conn的输出流中
@@ -50,17 +65,20 @@ public class TopwoHttpURLConnection {
                 //置空
                 outputStream = null;
             }
-            int code = conn.getResponseCode();
+            code = conn.getResponseCode();
             if (code == 200) {
                 inputStream = conn.getInputStream();
 
                 int len = 0;
                 byte[] buffer = new byte[TopwoHttpURLConnection.BUFFER];
                 while ((len = inputStream.read(buffer)) != -1) {
-                    if (responseListener != null) {
-                        responseListener.onResponseRead(buffer, len);
+                    if (listener != null) {
+                        listener.onResponseSuccess(buffer, len);
                     }
                 }
+            }
+            else {
+                listener.onResponseFail(code);
             }
         } catch (Exception e) {
             e.printStackTrace();
