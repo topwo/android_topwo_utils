@@ -1,5 +1,6 @@
 package com.topwo.utils;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -24,7 +25,11 @@ public class TopwoHttpURLConnection {
          * @param buffer
          * @param len
          */
-        void onResponseSuccess(byte[] buffer, int len);
+        void onResponseRead(byte[] buffer, int len);
+        /**
+         * 请求成功，并且输出流接收完毕
+         */
+        void onResponseSuccess();
 
         /**
          * 请求失败，返回错误码;
@@ -36,67 +41,80 @@ public class TopwoHttpURLConnection {
     /**
      * 在回调里使用ByteArrayOutputStream、FileOutputStream等OutputStream输出流接收（outputStream.write(buffer, 0, len);）
      * @param url_str
-     * @param req_byte
      * @param listener
      * @throws Exception
      */
-    public static void httpURLConnection(String url_str, byte[] req_byte, TopwoHttpURLConnectionListener listener) throws Exception {
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
-        HttpURLConnection conn = null;
+    public static void httpURLConnection(String url_str, TopwoHttpURLConnectionListener listener) throws Exception {
         Exception ex = null;
-        int code = 0;
+        HttpURLConnection conn = null;
+        InputStream inputStream = null;
         try {
             URL url = new URL(url_str);
             conn = (HttpURLConnection)url.openConnection();
             if (listener != null) {
                 listener.onHttpURLConnection(conn);
             }
-            if (req_byte != null) {
-                conn.setDoOutput(true);
-                //获取conn的输出流
-                outputStream = conn.getOutputStream();
-                //将请求体写入到conn的输出流中
-                outputStream.write(req_byte);
-                //记得调用输出流的flush方法
-                outputStream.flush();
-                //关闭输出流
-                outputStream.close();
-                //置空
-                outputStream = null;
-            }
-            code = conn.getResponseCode();
+            int code = conn.getResponseCode();
             if (code == 200) {
-                inputStream = conn.getInputStream();
+                if (listener != null) {
+                    inputStream = conn.getInputStream();
 
-                int len = 0;
-                byte[] buffer = new byte[TopwoHttpURLConnection.BUFFER];
-                while ((len = inputStream.read(buffer)) != -1) {
-                    if (listener != null) {
-                        listener.onResponseSuccess(buffer, len);
+                    int len = 0;
+                    byte[] buffer = new byte[TopwoHttpURLConnection.BUFFER];
+                    while ((len = inputStream.read(buffer)) != -1) {
+                        listener.onResponseRead(buffer, len);
                     }
+                    listener.onResponseSuccess();
                 }
             }
             else {
-                listener.onResponseFail(code);
+                if (listener != null) {
+                    listener.onResponseFail(code);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
             ex = e;
         } finally {
-            try {
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-                if (outputStream != null) {
-                    outputStream.close();
-                }
-                if (conn != null) {
-                    conn.disconnect();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                ex = e;
+            if (inputStream != null) {
+                inputStream.close();
+            }
+            if (conn != null) {
+                conn.disconnect();
+            }
+        }
+        if(ex != null){
+            throw ex;
+        }
+    }
+
+    /**
+     * 发送请求体
+     * @param conn
+     * @param req_byte
+     * @throws IOException
+     */
+    public static void sendRequestBody(HttpURLConnection conn, byte[] req_byte) throws IOException {
+        IOException ex = null;
+        OutputStream outputStream = null;
+        try {
+            conn.setDoOutput(true);
+            //获取conn的输出流
+            outputStream = conn.getOutputStream();
+            //将请求体写入到conn的输出流中
+            outputStream.write(req_byte);
+            //记得调用输出流的flush方法
+            outputStream.flush();
+            //关闭输出流
+            outputStream.close();
+            //置空
+            outputStream = null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            ex = e;
+        } finally {
+            if (outputStream != null) {
+                outputStream.close();
             }
         }
         if(ex != null){
