@@ -19,23 +19,23 @@ public class TopwoHttpURLConnection {
          * conn.setRequestMethod("POST");
          * @param conn
          */
-        void onHttpURLConnection(HttpURLConnection conn);
+        void onHttpURLConnection(HttpURLConnection conn) throws Exception;
         /**
          * 请求成功，返回输出流接收outputStream.write(buffer, 0, len);
          * @param buffer
          * @param len
          */
-        void onResponseRead(byte[] buffer, int len);
+        void onResponseRead(byte[] buffer, int len) throws Exception;
         /**
          * 请求成功，并且输出流接收完毕
          */
-        void onResponseSuccess();
+        void onResponseSuccess() throws Exception;
 
         /**
          * 请求失败，返回错误码;
          * @param code
          */
-        void onResponseFail(int code);
+        void onResponseFail(int code) throws Exception;
     }
 
     /**
