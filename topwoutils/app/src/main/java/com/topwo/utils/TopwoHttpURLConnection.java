@@ -45,7 +45,6 @@ public class TopwoHttpURLConnection {
      * @throws Exception
      */
     public static void httpURLConnection(String url_str, TopwoHttpURLConnectionListener listener) throws Exception {
-        Exception ex = null;
         HttpURLConnection conn = null;
         InputStream inputStream = null;
         try {
@@ -74,7 +73,7 @@ public class TopwoHttpURLConnection {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            ex = e;
+            throw e;
         } finally {
             if (inputStream != null) {
                 inputStream.close();
@@ -82,9 +81,6 @@ public class TopwoHttpURLConnection {
             if (conn != null) {
                 conn.disconnect();
             }
-        }
-        if(ex != null){
-            throw ex;
         }
     }
 
@@ -95,7 +91,6 @@ public class TopwoHttpURLConnection {
      * @throws IOException
      */
     public static void sendRequestBody(HttpURLConnection conn, byte[] req_byte) throws IOException {
-        IOException ex = null;
         OutputStream outputStream = null;
         try {
             conn.setDoOutput(true);
@@ -111,14 +106,11 @@ public class TopwoHttpURLConnection {
             outputStream = null;
         } catch (IOException e) {
             e.printStackTrace();
-            ex = e;
+            throw e;
         } finally {
             if (outputStream != null) {
                 outputStream.close();
             }
-        }
-        if(ex != null){
-            throw ex;
         }
     }
 }
