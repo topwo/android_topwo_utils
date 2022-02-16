@@ -19,4 +19,12 @@ public class Topwo {
         TopwoSystem.init(sContext);
         TopwoUri.init(sContext);
     }
+
+    public static Application getsApplication() {
+        return sApplication;
+    }
+
+    public static Context getsContext() {
+        return sContext;
+    }
 }
