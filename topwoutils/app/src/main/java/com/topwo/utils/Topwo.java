@@ -20,11 +20,11 @@ public class Topwo {
         TopwoUri.init(sContext);
     }
 
-    public static Application getsApplication() {
+    public static Application getApplication() {
         return sApplication;
     }
 
-    public static Context getsContext() {
+    public static Context getContext() {
         return sContext;
     }
 }
