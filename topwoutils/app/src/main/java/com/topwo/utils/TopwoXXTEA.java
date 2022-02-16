@@ -7,15 +7,23 @@ import java.util.Arrays;
 
 public class TopwoXXTEA {
     //xxtea
-    private static String xxtea_key = "";
     private static byte[] xxtea_sign;
+    private static String xxtea_key = "";
 
     private TopwoXXTEA() {
     }
 
-    public static void init(String str_key, String str_sign) {
-        xxtea_key = str_key;
+    public static void setSignAndKey(String str_sign, String str_key) {
         xxtea_sign = str_sign.getBytes();
+        xxtea_key = str_key;
+    }
+
+    /**
+     * 是否使用xxtea加密
+     * @param file_buffer 字节组
+     */
+    public static boolean isSign (byte[] file_buffer) {
+        return Arrays.equals(xxtea_sign, Arrays.copyOfRange(file_buffer, 0, xxtea_sign.length));
     }
 
     /**
@@ -28,9 +36,5 @@ public class TopwoXXTEA {
             file_buffer = XXTEA.decrypt(file_buffer, xxtea_key);
         }
         return file_buffer;
-    }
-
-    public static boolean isSign (byte[] file_buffer) {
-        return Arrays.equals(xxtea_sign, Arrays.copyOfRange(file_buffer, 0, xxtea_sign.length));
     }
 }
