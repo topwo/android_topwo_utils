@@ -12,14 +12,20 @@ import java.io.File;
 public class TopwoUri {
     private static final String TAG = TopwoUri.class.getSimpleName();
 
+    private static Context sContext = null;
+
+    public static void init(Context context) {
+        sContext = context.getApplicationContext();
+    }
+
     // Uri转File
-    public static File uriToFile(Uri uri, Context context) {
+    public static File uriToFile(Uri uri) {
         String path = null;
         if ("file".equals(uri.getScheme())) {
             path = uri.getEncodedPath();
             if (path != null) {
                 path = Uri.decode(path);
-                ContentResolver cr = context.getContentResolver();
+                ContentResolver cr = sContext.getContentResolver();
                 StringBuffer buff = new StringBuffer();
                 buff.append("(").append(MediaStore.Images.ImageColumns.DATA).append("=").append("'" + path + "'").append(")");
                 Cursor cur = cr.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[] { MediaStore.Images.ImageColumns._ID, MediaStore.Images.ImageColumns.DATA }, buff.toString(), null, null);
@@ -44,7 +50,7 @@ public class TopwoUri {
         } else if ("content".equals(uri.getScheme())) {
             // 4.2.2以后
             String[] proj = { MediaStore.Images.Media.DATA };
-            Cursor cursor = context.getContentResolver().query(uri, proj, null, null, null);
+            Cursor cursor = sContext.getContentResolver().query(uri, proj, null, null, null);
             if (cursor.moveToFirst()) {
                 int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
                 path = cursor.getString(columnIndex);
@@ -59,9 +65,9 @@ public class TopwoUri {
     }
 
     // File转Uri
-    public static Uri getImageContentUri(Context context,File imageFile) {
+    public static Uri getImageContentUri(File imageFile) {
         String filePath = imageFile.getAbsolutePath();
-        Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+        Cursor cursor = sContext.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 new String[] { MediaStore.Images.Media._ID }, MediaStore.Images.Media.DATA + "=? ",
                 new String[] { filePath }, null);
         if (cursor != null && cursor.moveToFirst()) {
@@ -72,7 +78,7 @@ public class TopwoUri {
             if (imageFile.exists()) {
                 ContentValues values = new ContentValues();
                 values.put(MediaStore.Images.Media.DATA, filePath);
-                return context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+                return sContext.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
             } else {
                 return null;
             }
