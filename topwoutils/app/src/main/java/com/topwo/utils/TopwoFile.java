@@ -10,12 +10,17 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class TopwoFile {
     private static final String TAG = TopwoFile.class.getSimpleName();
+
+    public interface UnzipInterface {
+        byte[] handleOutStream(OutputStream outputStream);
+    }
 
     private static Context sContext = null;
 
@@ -86,12 +91,12 @@ public class TopwoFile {
     /**
      * 传File的
      */
-    public static void unzip(File file, String outDirPath) throws Exception {
+    public static void unzip(File file, String outDirPath, UnzipInterface unzipInterface) throws Exception {
         if(file == null){
             return;
         }
         if(file.exists()){
-            unzip(new FileInputStream(file), outDirPath);
+            unzip(new FileInputStream(file), outDirPath, unzipInterface);
         }
     }
 
@@ -99,7 +104,7 @@ public class TopwoFile {
      * 传FileInputStream的
      * zip文件必须存在
      */
-    public static void unzip(InputStream fis, String outDirPath) throws Exception {
+    public static void unzip(InputStream fis, String outDirPath, UnzipInterface unzipInterface) throws Exception {
         if(fis == null){
             return;
         }
@@ -123,7 +128,12 @@ public class TopwoFile {
                 }
                 baos.flush();
                 baos.close();
-                TopwoFile.writeFile(entryFile, baos.toByteArray());
+                if (null != unzipInterface) {
+                    TopwoFile.writeFile(entryFile, unzipInterface.handleOutStream(baos));
+                }
+                else {
+                    TopwoFile.writeFile(entryFile, baos.toByteArray());
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
