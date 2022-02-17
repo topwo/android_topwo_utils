@@ -1,5 +1,6 @@
 package com.topwo.utils;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -375,13 +376,18 @@ public class TopwoSystem {
     /**
      * 显示退出对话框
      */
-    public static void showExitDialog(int iconResId, int titleResId, int msgResId, int leftButtonResId, int rightButtonResId, DialogInterface.OnClickListener leftOnClickListener, DialogInterface.OnClickListener rightOnClickListener) {
-        new AlertDialog.Builder(sContext)
-                .setIcon(iconResId)
-                .setTitle(titleResId)
-                .setMessage(msgResId)
-                .setNegativeButton(leftButtonResId, leftOnClickListener)
-                .setPositiveButton(rightButtonResId, rightOnClickListener)
-                .show();
+    public static void showExitDialog(Activity activity, int iconResId, int titleResId, int msgResId, int leftButtonResId, int rightButtonResId, DialogInterface.OnClickListener leftOnClickListener, DialogInterface.OnClickListener rightOnClickListener) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AlertDialog.Builder(activity)
+                        .setIcon(iconResId)
+                        .setTitle(titleResId)
+                        .setMessage(msgResId)
+                        .setNegativeButton(leftButtonResId, leftOnClickListener)
+                        .setPositiveButton(rightButtonResId, rightOnClickListener)
+                        .show();
+            }
+        });
     }
 }
